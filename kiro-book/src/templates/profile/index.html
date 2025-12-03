@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - Book Sharing App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Profile Information</h4>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ current_user.alias }}</h5>
+                <p class="card-text">
+                    <strong>Email:</strong> {{ current_user.email }}
+                </p>
+                <p class="card-text">
+                    <strong>Member since:</strong> {{ current_user.registration_date.strftime('%Y-%m-%d') }}
+                </p>
+                <p class="card-text">
+                    <strong>Bio:</strong><br>
+                    {% if current_user.bio %}
+                        {{ current_user.bio }}
+                    {% else %}
+                        <em>No bio provided.</em>
+                    {% endif %}
+                </p>
+                <a href="{{ url_for('profile.edit') }}" class="btn btn-primary">Edit Profile</a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Invite Information</h4>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    <strong>Your invite code:</strong><br>
+                    <span class="fs-5 fw-bold">{{ current_user.personal_invite_code }}</span>
+                </p>
+                <p class="card-text">
+                    <strong>Invites used:</strong> {{ current_user.invites_used_count }}
+                </p>
+                <a href="{{ url_for('profile.invite') }}" class="btn btn-outline-primary">Manage Invites</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">My Books</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <p class="mb-0">Books you've shared with the community.</p>
+                    <a href="{{ url_for('books.create') }}" class="btn btn-primary">Add New Book</a>
+                </div>
+                
+                <a href="{{ url_for('profile.books') }}" class="btn btn-outline-primary">View All My Books</a>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Borrowed Books</h4>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">Books you're currently borrowing from others.</p>
+                <a href="{{ url_for('profile.borrowed') }}" class="btn btn-outline-primary mt-3">View Borrowed Books</a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Borrowing History</h4>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">Your history of borrowed books.</p>
+                <a href="{{ url_for('profile.history') }}" class="btn btn-outline-primary mt-3">View History</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

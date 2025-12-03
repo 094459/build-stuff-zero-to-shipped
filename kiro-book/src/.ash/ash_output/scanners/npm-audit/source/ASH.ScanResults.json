@@ -1,0 +1,1 @@
+{"scanner_name": "npm-audit", "target": "/Users/ricsue/build-stuff/kiro/src", "target_type": "source", "exit_code": 0, "finding_count": 0, "start_time": "2025-12-01T15:52:23.035134Z", "end_time": "2025-12-01T15:52:23.339597Z", "duration": 0.304463, "severity_counts": {"suppressed": 0, "critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}, "status": "PASSED"}

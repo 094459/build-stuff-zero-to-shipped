@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}My Invite Code - Book Sharing App{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">My Invite Code</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <p>Share your invite code with friends to let them join the Book Share community!</p>
+                </div>
+                
+                <div class="text-center mb-4">
+                    <h2 class="display-4 fw-bold">{{ invite_code }}</h2>
+                </div>
+                
+                <div class="d-grid">
+                    <button class="btn btn-primary" id="copyButton" onclick="copyInviteCode()">
+                        <i class="bi bi-clipboard"></i> Copy to Clipboard
+                    </button>
+                </div>
+                
+                <hr>
+                
+                <div class="mt-4">
+                    <h5>Invite Statistics</h5>
+                    <p>Number of people who used your invite code: <strong>{{ current_user.invites_used_count }}</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function copyInviteCode() {
+    navigator.clipboard.writeText('{{ invite_code }}').then(function() {
+        const button = document.getElementById('copyButton');
+        button.innerHTML = '<i class="bi bi-clipboard-check"></i> Copied!';
+        button.classList.remove('btn-primary');
+        button.classList.add('btn-success');
+        
+        setTimeout(function() {
+            button.innerHTML = '<i class="bi bi-clipboard"></i> Copy to Clipboard';
+            button.classList.remove('btn-success');
+            button.classList.add('btn-primary');
+        }, 2000);
+    });
+}
+</script>
+{% endblock %}

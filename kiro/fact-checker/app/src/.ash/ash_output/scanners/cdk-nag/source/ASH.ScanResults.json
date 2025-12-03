@@ -1,0 +1,1 @@
+{"scanner_name": "cdk-nag", "target": "/Users/ricsue/build-stuff/kiro/fact-checker/app/src", "target_type": "source", "exit_code": 0, "finding_count": 0, "start_time": "2025-12-03T13:58:41.318295Z", "end_time": "2025-12-03T13:58:41.329049Z", "duration": 0.010754, "severity_counts": {"suppressed": 0, "critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}, "status": "PASSED"}

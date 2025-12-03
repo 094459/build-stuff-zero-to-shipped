@@ -1,0 +1,1 @@
+{"scanner_name": "cdk-nag", "target": "/Users/ricsue/build-stuff/kiro/src", "target_type": "source", "exit_code": 0, "finding_count": 0, "start_time": "2025-12-01T15:52:23.034901Z", "end_time": "2025-12-01T15:52:23.049690Z", "duration": 0.014789, "severity_counts": {"suppressed": 0, "critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}, "status": "PASSED"}

@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Add License Headers",
+  "description": "Automatically adds SPDX 2.0 headers for Apache 2.0 license and copyright notice '(C)opyright 2025 BeachGeek.co.uk' to Python files when they are created or edited",
+  "version": "1",
+  "when": {
+    "type": "fileCreated",
+    "patterns": [
+      "**/*.py"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Check if this Python file has the proper SPDX 2.0 license header for Apache 2.0 and the copyright notice '# (C)opyright 2025 BeachGeek.co.uk'. If missing, add them at the top of the file in the correct format: SPDX-License-Identifier: Apache-2.0 followed by the copyright line."
+  }
+}

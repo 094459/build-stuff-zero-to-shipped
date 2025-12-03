@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Borrow Requests - Book Sharing App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">Borrow Requests</h1>
+        
+        {% if requests %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Requester</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in requests %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('books.view', book_id=request.book_id) }}">
+                                    {{ request.book.title }}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('profile.view', user_id=request.requester_id) }}">
+                                    {{ request.requester.alias }}
+                                </a>
+                            </td>
+                            <td>{{ request.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <div class="d-flex">
+                                    <form action="{{ url_for('books.approve_request', request_id=request.request_id) }}" method="POST" class="me-2">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="bi bi-check-lg"></i> Approve
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('books.deny_request', request_id=request.request_id) }}" method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="bi bi-x-lg"></i> Deny
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                You don't have any pending borrow requests.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Book Requests - Book Sharing App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">Book Requests</h1>
+        
+        <!-- Incoming Requests (books others want to borrow from you) -->
+        <h3 class="mt-4 mb-3">Incoming Requests</h3>
+        {% if incoming_requests %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Requester</th>
+                            <th>Request Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in incoming_requests %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('books.view', book_id=request.book_id) }}">
+                                    {{ request.book.title }}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('profile.view', user_id=request.requester_id) }}">
+                                    {{ request.requester.alias }}
+                                </a>
+                            </td>
+                            <td>{{ request.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <form action="{{ url_for('books.approve_request', request_id=request.request_id) }}" method="post" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-success me-1">
+                                            <i class="bi bi-check-lg"></i> Approve
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('books.reject_request', request_id=request.request_id) }}" method="post" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-x-lg"></i> Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                You don't have any incoming borrow requests.
+            </div>
+        {% endif %}
+        
+        <!-- Outgoing Requests (books you want to borrow) -->
+        <h3 class="mt-5 mb-3">My Borrow Requests</h3>
+        {% if outgoing_requests %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Owner</th>
+                            <th>Request Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in outgoing_requests %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('books.view', book_id=request.book_id) }}">
+                                    {{ request.book.title }}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('profile.view', user_id=request.book.owner_id) }}">
+                                    {{ request.book.owner.alias }}
+                                </a>
+                            </td>
+                            <td>{{ request.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if request.status == 'pending' %}bg-warning
+                                    {% elif request.status == 'approved' %}bg-success
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ request.status.capitalize() }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                You haven't made any borrow requests yet.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

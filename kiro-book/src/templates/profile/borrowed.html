@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Borrowed Books - Book Sharing App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">Books I'm Borrowing</h1>
+        
+        {% if books %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Owner</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book in books %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('books.view', book_id=book.book_id) }}">
+                                    {{ book.title }}
+                                </a>
+                            </td>
+                            <td>{{ book.author }}</td>
+                            <td>
+                                <a href="{{ url_for('profile.view', user_id=book.owner_id) }}">
+                                    {{ book.owner.alias }}
+                                </a>
+                            </td>
+                            <td>
+                                <form action="{{ url_for('books.return_book', book_id=book.book_id) }}" method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-warning btn-sm">
+                                        <i class="bi bi-arrow-return-left"></i> Return Book
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                You're not currently borrowing any books.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

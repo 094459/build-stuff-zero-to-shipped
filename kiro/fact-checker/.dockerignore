@@ -1,0 +1,9 @@
+.venv
+__pycache__
+*.pyc
+.git
+.kiro
+.vscode
+planning
+data-model
+.env

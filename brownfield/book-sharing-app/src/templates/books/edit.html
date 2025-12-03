@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Book - Book Sharing App{% endblock %}
+
+{% block styles %}
+<style>
+    .star-rating .stars {
+        font-size: 1.8rem;
+        cursor: pointer;
+    }
+    .star-rating .stars .bi-star-fill {
+        color: #ffc107;
+    }
+    .star-rating .stars .bi-star {
+        color: #ccc;
+    }
+    .star-rating .stars i:hover ~ i {
+        color: #ccc;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Edit Book</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('books.edit', book_id=book.book_id) }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.title.label(class="form-label") }}
+                        {{ form.title(class="form-control") }}
+                        {% if form.title.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.title.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.author.label(class="form-label") }}
+                        {{ form.author(class="form-control") }}
+                        {% if form.author.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.author.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.isbn.label(class="form-label") }}
+                        {{ form.isbn(class="form-control") }}
+                        {% if form.isbn.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.isbn.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Optional</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.purchase_url.label(class="form-label") }}
+                        {{ form.purchase_url(class="form-control") }}
+                        {% if form.purchase_url.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.purchase_url.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Optional</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.recommendation_rating.label(class="form-label") }}
+                        <div class="star-rating">
+                            <input type="hidden" name="recommendation_rating" id="recommendation_rating" value="{{ form.recommendation_rating.data or book.recommendation_rating }}">
+                            <div class="stars">
+                                <i class="bi bi-star star" data-rating="1"></i>
+                                <i class="bi bi-star star" data-rating="2"></i>
+                                <i class="bi bi-star star" data-rating="3"></i>
+                                <i class="bi bi-star star" data-rating="4"></i>
+                                <i class="bi bi-star star" data-rating="5"></i>
+                            </div>
+                            <div class="rating-text mt-1">Current rating: <span id="rating-value">{{ book.recommendation_rating }}</span> stars</div>
+                        </div>
+                        {% if form.recommendation_rating.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.recommendation_rating.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">Click on a star to set your rating</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.is_fiction.label(class="form-label") }}
+                        <div>
+                            {% for subfield in form.is_fiction %}
+                                <div class="form-check form-check-inline">
+                                    {% if (book.is_fiction and subfield.data == 'fiction') or (not book.is_fiction and subfield.data == 'non-fiction') %}
+                                        {{ subfield(class="form-check-input", checked=true) }}
+                                    {% else %}
+                                        {{ subfield(class="form-check-input") }}
+                                    {% endif %}
+                                    {{ subfield.label(class="form-check-label") }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        {{ form.is_hidden(class="form-check-input") }}
+                        {{ form.is_hidden.label(class="form-check-label") }}
+                        <small class="form-text text-muted d-block">
+                            When hidden, this book will only be visible in your profile but not on public dashboards
+                        </small>
+                    </div>
+                    
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const stars = document.querySelectorAll('.star-rating .stars i');
+        const ratingInput = document.getElementById('recommendation_rating');
+        const ratingText = document.getElementById('rating-value');
+        
+        // Set initial rating
+        const initialRating = parseInt(ratingInput.value) || 3;
+        updateStars(initialRating);
+        
+        // Add click event to stars
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.getAttribute('data-rating'));
+                ratingInput.value = rating;
+                updateStars(rating);
+            });
+            
+            // Add hover effect
+            star.addEventListener('mouseenter', function() {
+                const rating = parseInt(this.getAttribute('data-rating'));
+                highlightStars(rating);
+            });
+        });
+        
+        // Reset stars on mouse leave
+        document.querySelector('.star-rating .stars').addEventListener('mouseleave', function() {
+            const currentRating = parseInt(ratingInput.value);
+            updateStars(currentRating);
+        });
+        
+        // Function to update stars based on rating
+        function updateStars(rating) {
+            stars.forEach(star => {
+                const starRating = parseInt(star.getAttribute('data-rating'));
+                if (starRating <= rating) {
+                    star.classList.remove('bi-star');
+                    star.classList.add('bi-star-fill');
+                } else {
+                    star.classList.remove('bi-star-fill');
+                    star.classList.add('bi-star');
+                }
+            });
+            ratingText.textContent = rating;
+        }
+        
+        // Function to highlight stars on hover
+        function highlightStars(rating) {
+            stars.forEach(star => {
+                const starRating = parseInt(star.getAttribute('data-rating'));
+                if (starRating <= rating) {
+                    star.classList.remove('bi-star');
+                    star.classList.add('bi-star-fill');
+                } else {
+                    star.classList.remove('bi-star-fill');
+                    star.classList.add('bi-star');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% endblock %}

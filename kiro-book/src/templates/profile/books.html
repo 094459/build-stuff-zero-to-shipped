@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}My Books - Book Sharing App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>My Books</h1>
+            <a href="{{ url_for('books.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Add New Book
+            </a>
+        </div>
+        
+        {% if books %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Rating</th>
+                            <th>Status</th>
+                            <th>Visibility</th>
+                            <th>Upvotes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book in books %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('books.view', book_id=book.book_id) }}">
+                                    {{ book.title }}
+                                </a>
+                            </td>
+                            <td>{{ book.author }}</td>
+                            <td>
+                                {% for i in range(book.recommendation_rating) %}
+                                <i class="bi bi-star-fill text-warning"></i>
+                                {% endfor %}
+                                {% for i in range(5 - book.recommendation_rating) %}
+                                <i class="bi bi-star text-warning"></i>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <span class="badge {% if book.is_available %}bg-success{% else %}bg-danger{% endif %}">
+                                    {% if book.is_available %}Available{% else %}Borrowed{% endif %}
+                                </span>
+                                {% if not book.is_available and book.current_borrower_id %}
+                                    <br><small class="text-muted">by {{ book.borrower.alias }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge {% if book.is_hidden %}bg-secondary{% else %}bg-info{% endif %}">
+                                    {% if book.is_hidden %}Hidden{% else %}Public{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <i class="bi bi-hand-thumbs-up"></i> {{ book.upvote_count }}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('books.edit', book_id=book.book_id) }}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    <form action="{{ url_for('books.toggle_visibility', book_id=book.book_id) }}" method="post" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-sm {% if book.is_hidden %}btn-outline-info{% else %}btn-outline-secondary{% endif %}">
+                                            {% if book.is_hidden %}
+                                                <i class="bi bi-eye"></i> Show
+                                            {% else %}
+                                                <i class="bi bi-eye-slash"></i> Hide
+                                            {% endif %}
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                You haven't added any books yet. <a href="{{ url_for('books.create') }}">Add your first book</a> to share with others!
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "ash": {
+      "command": "uvx",
+      "args": [
+        "--from=git+https://github.com/awslabs/automated-security-helper@v3.1.2",
+        "ash",
+        "mcp"
+      ],
+      "disabled": false,
+      "autoApprove": [
+        "check_installation"
+      ],
+      "disabledTools": []
+    }
+  }
+}

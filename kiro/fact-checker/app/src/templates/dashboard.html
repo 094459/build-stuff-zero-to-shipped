@@ -1,0 +1,44 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- (C)opyright 2025 BeachGeek.co.uk -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Fact Checker{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>Dashboard</h1>
+    
+    <div class="info-box">
+        <h2>About Fact Checker</h2>
+        <p>Welcome to Fact Checker! This application allows you to submit facts for community verification. 
+        Browse existing facts, vote on their accuracy, and contribute your own facts with supporting evidence. 
+        Together, we can build a more informed community.</p>
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('facts.create') }}" class="btn btn-primary">Create New Fact</a>
+        <a href="{{ url_for('categories.create') }}" class="btn btn-secondary">Create New Category</a>
+    </div>
+
+    <h2>Recent Facts</h2>
+    {% if facts %}
+        <div class="facts-list">
+            {% for fact in facts %}
+                <div class="fact-card">
+                    <div class="fact-header">
+                        <span class="category-badge">{{ fact.category.name }}</span>
+                        <span class="fact-date">{{ fact.created_at.strftime('%Y-%m-%d') }}</span>
+                    </div>
+                    <p class="fact-content">{{ fact.content[:200] }}{% if fact.content|length > 200 %}...{% endif %}</p>
+                    <div class="fact-footer">
+                        <span class="author">By: {{ fact.author.username }}</span>
+                        <a href="{{ url_for('facts.view', fact_id=fact.id) }}" class="btn btn-small">View & Vote</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="no-facts">No facts available yet. Be the first to create one!</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,1 @@
+{"scanner_name": "bandit", "target": "/Users/ricsue/build-stuff/kiro/src", "target_type": "source", "exit_code": 0, "finding_count": 0, "start_time": "2025-12-01T15:52:23.027295Z", "end_time": "2025-12-01T15:52:24.485440Z", "duration": 1.458145, "severity_counts": {"suppressed": 0, "critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}, "status": "PASSED"}

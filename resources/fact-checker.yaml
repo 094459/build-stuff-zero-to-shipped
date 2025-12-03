@@ -1,0 +1,95 @@
+tables:
+  users:
+    columns:
+      id:
+        type: integer
+        primary_key: true
+        autoincrement: true
+      email:
+        type: text
+        unique: true
+        not_null: true
+      username:
+        type: text
+        not_null: true
+      password_hash:
+        type: text
+        not_null: true
+      created_at:
+        type: datetime
+        not_null: true
+        default: CURRENT_TIMESTAMP
+
+  categories:
+    columns:
+      id:
+        type: integer
+        primary_key: true
+        autoincrement: true
+      name:
+        type: text
+        not_null: true
+        unique: true
+      description:
+        type: text
+
+  facts:
+    columns:
+      id:
+        type: integer
+        primary_key: true
+        autoincrement: true
+      user_id:
+        type: integer
+        not_null: true
+        references: users.id
+      category_id:
+        type: integer
+        not_null: true
+        references: categories.id
+      content:
+        type: text
+        not_null: true
+      supporting_url:
+        type: text
+      supporting_info:
+        type: text
+      created_at:
+        type: datetime
+        not_null: true
+        default: CURRENT_TIMESTAMP
+      updated_at:
+        type: datetime
+    indexes:
+      - columns: [user_id]
+      - columns: [category_id]
+
+  votes:
+    columns:
+      id:
+        type: integer
+        primary_key: true
+        autoincrement: true
+      fact_id:
+        type: integer
+        not_null: true
+        references: facts.id
+      user_id:
+        type: integer
+        not_null: true
+        references: users.id
+      vote_type:
+        type: text
+        not_null: true
+        check: "vote_type IN ('fact', 'fake')"
+      created_at:
+        type: datetime
+        not_null: true
+        default: CURRENT_TIMESTAMP
+    indexes:
+      - columns: [fact_id]
+      - columns: [user_id]
+    constraints:
+      - type: unique
+        columns: [fact_id, user_id]
+

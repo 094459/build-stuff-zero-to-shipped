@@ -1,0 +1,26 @@
+.venv
+.venv/
+.ropeproject
+.ropeproject/
+.vscode
+.vscode/
+instance
+instance/
+migrations
+migrations/
+# Python virtual environments
+venv/
+env/
+.env/
+.venv/
+ENV/
+
+# Python byte-compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/%

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "Finch": {
+      "command": "uvx",
+      "args": [
+        "awslabs.finch-mcp-server@latest"
+      ],
+      "disabled": false,
+      "disabledTools": []
+    }
+  }
+}

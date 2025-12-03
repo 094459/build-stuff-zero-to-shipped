@@ -1,0 +1,1 @@
+{"scanner_name": "semgrep", "target": "/Users/ricsue/build-stuff/kiro/fact-checker/app/src", "target_type": "source", "exit_code": 0, "finding_count": 0, "start_time": "2025-12-03T13:58:41.321036Z", "end_time": "2025-12-03T13:59:22.805531Z", "duration": 41.484495, "severity_counts": {"suppressed": 0, "critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}, "status": "PASSED"}

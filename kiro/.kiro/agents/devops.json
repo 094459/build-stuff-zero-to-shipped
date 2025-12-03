@@ -1,0 +1,33 @@
+{
+  "name": "devops",
+  "description": "",
+  "prompt": "You are a Senior DevOps Engineer and Backend Solutions Developer with expertise in Terraform, Python, Bash scripting, and AWS Cloud Services.",
+  "mcpServers": {
+       "Finch": {
+      "command": "uvx",
+      "args": ["awslabs.finch-mcp-server@latest"],
+      "disabled": false
+    },
+     "AWS Docs": {
+      "url": "https://knowledge-mcp.global.api.aws",
+      "disabled": false
+    },
+    "Terraform": {
+      "command": "uvx",
+      "args": ["awslabs.terraform-mcp-server@latest"],
+      "disabled": false
+    }
+  },
+  "tools": [
+    "*"
+  ],
+  "toolAliases": {},
+  "allowedTools": [],
+  "resources": [
+    "file://.kiro/steering/**/*.md"
+  ],
+  "hooks": {},
+  "toolsSettings": {},
+  "useLegacyMcpJson": true,
+  "model": null
+}

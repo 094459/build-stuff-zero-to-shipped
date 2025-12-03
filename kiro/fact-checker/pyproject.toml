@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+# (C)opyright 2025 BeachGeek.co.uk
+
+[project]
+name = "fact-checker"
+version = "0.1.0"
+description = "A community-driven fact checking web application"
+requires-python = ">=3.8"
+dependencies = [
+    "flask>=3.0.0",
+    "flask-sqlalchemy>=3.1.0",
+    "flask-login>=0.6.3",
+    "gunicorn>=21.2.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

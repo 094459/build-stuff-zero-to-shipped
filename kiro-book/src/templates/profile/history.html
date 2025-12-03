@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Borrowing History - Book Sharing App{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">My Borrowing History</h1>
+        
+        <!-- Books I've borrowed from others -->
+        <h3 class="mt-4 mb-3">Books I've Borrowed</h3>
+        {% if borrowed_history %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Owner</th>
+                            <th>Borrowed Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in borrowed_history %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('books.view', book_id=record.book_id) }}">
+                                    {{ record.book.title }}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('profile.view', user_id=record.book.owner_id) }}">
+                                    {{ record.book.owner.alias }}
+                                </a>
+                            </td>
+                            <td>{{ record.borrow_date.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                {% if record.return_date %}
+                                    {{ record.return_date.strftime('%Y-%m-%d') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge {% if record.return_date %}bg-success{% else %}bg-warning{% endif %}">
+                                    {% if record.return_date %}Returned{% else %}Active{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                You haven't borrowed any books yet.
+            </div>
+        {% endif %}
+        
+        <!-- Books I've lent to others -->
+        <h3 class="mt-5 mb-3">Books I've Lent Out</h3>
+        {% if lent_history %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Book</th>
+                            <th>Borrower</th>
+                            <th>Borrowed Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in lent_history %}
+                        <tr>
+                            <td>
+                                <a href="{{ url_for('books.view', book_id=record.book_id) }}">
+                                    {{ record.book.title }}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('profile.view', user_id=record.borrower_id) }}">
+                                    {{ record.borrower.alias }}
+                                </a>
+                            </td>
+                            <td>{{ record.borrow_date.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                {% if record.return_date %}
+                                    {{ record.return_date.strftime('%Y-%m-%d') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge {% if record.return_date %}bg-success{% else %}bg-warning{% endif %}">
+                                    {% if record.return_date %}Returned{% else %}Active{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                You haven't lent any books yet.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

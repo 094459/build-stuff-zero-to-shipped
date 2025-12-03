@@ -1,0 +1,229 @@
+{% extends "base.html" %} {% block title %}{{ book.title }} - Book Sharing App{%
+endblock %} {% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="mb-2">{{ book.title }}</h1>
+        <h4 class="text-muted mb-4">by {{ book.author }}</h4>
+
+        <div class="mb-3">
+            {% for i in range(book.recommendation_rating) %}
+            <i class="bi bi-star-fill text-warning"></i>
+            {% endfor %} {% for i in range(5 - book.recommendation_rating) %}
+            <i class="bi bi-star text-warning"></i>
+            {% endfor %}
+            <span class="ms-2">{{ book.recommendation_rating }}/5</span>
+        </div>
+
+        <div class="mb-4">
+            <p>
+                <strong>Shared by:</strong>
+                <a href="{{ url_for('profile.view', user_id=book.owner_id) }}"
+                    >{{ book.owner.alias }}</a
+                >
+            </p>
+            
+            <p>
+                <strong>Category:</strong>
+                <span class="badge {% if book.is_fiction %}bg-info{% else %}bg-secondary{% endif %}">
+                    {% if book.is_fiction %}Fiction{% else %}Non-Fiction{% endif %}
+                </span>
+            </p>
+
+            {% if book.isbn %}
+            <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+            {% endif %} {% if book.purchase_url %}
+            <p>
+                <strong>Purchase:</strong>
+                <a
+                    href="{{ book.purchase_url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    Buy this book <i class="bi bi-box-arrow-up-right"></i>
+                </a>
+            </p>
+            {% endif %}
+
+            <p>
+                <strong>Status:</strong>
+                <span
+                    class="badge {% if book.is_available %}bg-success{% else %}bg-danger{% endif %}"
+                >
+                    {% if book.is_available %}Available{% else %}Borrowed{%
+                    endif %}
+                </span>
+            </p>
+
+            {% if not book.is_available and book.current_borrower %}
+            <p>
+                <strong>Currently borrowed by:</strong>
+                {{ book.borrower.alias }}
+            </p>
+            {% endif %}
+        </div>
+
+        <div class="d-flex mb-4">
+            <!-- Upvote button -->
+            {% if current_user.is_authenticated %}
+            <form
+                action="{{ url_for('books.toggle_upvote', book_id=book.book_id) }}"
+                method="POST"
+                class="me-2"
+            >
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button
+                    type="submit"
+                    class="btn {% if user_upvoted %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                >
+                    <i class="bi bi-hand-thumbs-up"></i>
+                    {% if user_upvoted %}Upvoted{% else %}Upvote{% endif %} ({{
+                    book.upvote_count }})
+                </button>
+            </form>
+            {% else %}
+            <button class="btn btn-outline-primary me-2" disabled>
+                <i class="bi bi-hand-thumbs-up"></i> {{ book.upvote_count }}
+                Upvotes
+            </button>
+            {% endif %}
+
+            <!-- Borrow button -->
+            {% if current_user.is_authenticated and book.is_available and
+            book.owner_id != current_user.user_id %}
+            <form
+                action="{{ url_for('books.request_borrow', book_id=book.book_id) }}"
+                method="POST"
+            >
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button
+                    type="submit"
+                    class="btn btn-success"
+                    {%
+                    if
+                    pending_request
+                    %}disabled{%
+                    endif
+                    %}
+                >
+                    {% if pending_request %}
+                    <i class="bi bi-hourglass-split"></i> Request Pending {%
+                    else %} <i class="bi bi-book"></i> Request to Borrow {%
+                    endif %}
+                </button>
+            </form>
+            {% endif %}
+
+            <!-- Return button -->
+            {% if current_user.is_authenticated and not book.is_available and
+            book.current_borrower_id == current_user.user_id %}
+            <form
+                action="{{ url_for('books.return_book', book_id=book.book_id) }}"
+                method="POST"
+            >
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-warning">
+                    <i class="bi bi-arrow-return-left"></i> Return Book
+                </button>
+            </form>
+            {% endif %}
+
+            <!-- Edit button for owner -->
+            {% if current_user.is_authenticated and book.owner_id ==
+            current_user.user_id %}
+            <a
+                href="{{ url_for('books.edit', book_id=book.book_id) }}"
+                class="btn btn-outline-secondary ms-2"
+            >
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            {% endif %}
+        </div>
+
+        <hr />
+
+        <!-- Comments section -->
+        <h3 class="mb-3">Comments</h3>
+
+        {% if comments %}
+        <div class="mb-4">
+            {% for comment in comments %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            <a
+                                href="{{ url_for('profile.view', user_id=comment.user_id) }}"
+                                >{{ comment.user.alias }}</a
+                            >
+                        </h6>
+                        <small class="text-muted"
+                            >{{ comment.created_at.strftime('%Y-%m-%d %H:%M')
+                            }}</small
+                        >
+                    </div>
+                    <p class="card-text">{{ comment.comment_text }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted">No comments yet.</p>
+        {% endif %}
+
+        <!-- Comment form -->
+        {% if current_user.is_authenticated %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Add a Comment</h5>
+                <form
+                    action="{{ url_for('books.add_comment', book_id=book.book_id) }}"
+                    method="POST"
+                >
+                    {{ comment_form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ comment_form.comment_text(class="form-control",
+                        rows=3, placeholder="Write your comment here...") }} {%
+                        if comment_form.comment_text.errors %}
+                        <div class="invalid-feedback d-block">
+                            {% for error in comment_form.comment_text.errors %}
+                            {{ error }} {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid">
+                        {{ comment_form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <a href="{{ url_for('auth.login') }}">Log in</a> to leave a comment.
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">About the Owner</h5>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ book.owner.alias }}</h5>
+                {% if book.owner.bio %}
+                <p class="card-text">{{ book.owner.bio }}</p>
+                {% else %}
+                <p class="card-text text-muted">No bio provided.</p>
+                {% endif %}
+                <a
+                    href="{{ url_for('profile.view', user_id=book.owner_id) }}"
+                    class="btn btn-outline-primary"
+                    >View Profile</a
+                >
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

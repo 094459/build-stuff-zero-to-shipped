@@ -1,0 +1,184 @@
+{% extends "base.html" %} {% block title %}Dashboard - Book Sharing App{%
+endblock %} {% block header_bg %}#f0f8ff{% endblock %} {% block logo_height
+%}80px{% endblock %} {% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">Book Dashboard</h1>
+
+        <!-- Category Filter -->
+        <div class="mb-4">
+            <h5 class="mb-2">Filter by Category:</h5>
+            <div class="btn-group w-100">
+                <a
+                    href="{{ url_for('main.index', view=active_tab, category='all') }}"
+                    class="btn {% if active_category == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                >
+                    All Categories
+                </a>
+                <a
+                    href="{{ url_for('main.index', view=active_tab, category='fiction') }}"
+                    class="btn {% if active_category == 'fiction' %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                >
+                    Fiction
+                </a>
+                <a
+                    href="{{ url_for('main.index', view=active_tab, category='non-fiction') }}"
+                    class="btn {% if active_category == 'non-fiction' %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                >
+                    Non-Fiction
+                </a>
+            </div>
+        </div>
+
+        <!-- Tab navigation -->
+        <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+                <a
+                    class="nav-link {% if active_tab == 'all' %}active{% endif %}"
+                    href="{{ url_for('main.index', view='all', category=active_category) }}"
+                >
+                    All Books
+                </a>
+            </li>
+            <li class="nav-item">
+                <a
+                    class="nav-link {% if active_tab == 'available' %}active{% endif %}"
+                    href="{{ url_for('main.index', view='available', category=active_category) }}"
+                >
+                    Available Books
+                </a>
+            </li>
+        </ul>
+
+        {% if books.items %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for book in books.items %}
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ book.title }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            by {{ book.author }}
+                        </h6>
+
+                        <div
+                            class="d-flex justify-content-between align-items-center mb-2"
+                        >
+                            <div>
+                                {% for i in range(book.recommendation_rating) %}
+                                <i class="bi bi-star-fill text-warning"></i>
+                                {% endfor %} {% for i in range(5 -
+                                book.recommendation_rating) %}
+                                <i class="bi bi-star text-warning"></i>
+                                {% endfor %}
+                            </div>
+                            <span
+                                class="badge {% if book.is_fiction %}bg-info{% else %}bg-secondary{% endif %}"
+                            >
+                                {% if book.is_fiction %}Fiction{% else
+                                %}Non-Fiction{% endif %}
+                            </span>
+                        </div>
+
+                        <p class="card-text">
+                            <small class="text-muted">
+                                Shared by: {{ book.owner.alias }}
+                            </small>
+                        </p>
+
+                        <!-- Status badge -->
+                        <p>
+                            <span
+                                class="badge {% if book.is_available %}bg-success{% else %}bg-danger{% endif %}"
+                            >
+                                {% if book.is_available %}Available{% else
+                                %}Borrowed{% endif %}
+                            </span>
+                            {% if not book.is_available and
+                            book.current_borrower_id %}
+                            <small class="text-muted"
+                                >by {{ book.borrower.alias }}</small
+                            >
+                            {% endif %}
+                        </p>
+
+                        <div
+                            class="d-flex justify-content-between align-items-center"
+                        >
+                            <div>
+                                <i class="bi bi-hand-thumbs-up"></i> {{
+                                book.upvote_count }}
+                            </div>
+                            <a
+                                href="{{ url_for('books.view', book_id=book.book_id) }}"
+                                class="btn btn-primary btn-sm"
+                                >View Details</a
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if books.has_prev %}
+                <li class="page-item">
+                    <a
+                        class="page-link"
+                        href="{{ url_for('main.index', view=active_tab, page=books.prev_num) }}"
+                        >Previous</a
+                    >
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                </li>
+                {% endif %} {% for page_num in books.iter_pages(left_edge=1,
+                right_edge=1, left_current=1, right_current=2) %} {% if page_num
+                %} {% if books.page == page_num %}
+                <li class="page-item active">
+                    <span class="page-link">{{ page_num }}</span>
+                </li>
+                {% else %}
+                <li class="page-item">
+                    <a
+                        class="page-link"
+                        href="{{ url_for('main.index', view=active_tab, page=page_num) }}"
+                        >{{ page_num }}</a
+                    >
+                </li>
+                {% endif %} {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+                {% endif %} {% endfor %} {% if books.has_next %}
+                <li class="page-item">
+                    <a
+                        class="page-link"
+                        href="{{ url_for('main.index', view=active_tab, page=books.next_num) }}"
+                        >Next</a
+                    >
+                </li>
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% else %}
+        <div class="alert alert-info">
+            {% if active_tab == 'available' %} No books available at the moment.
+            Check back later or
+            <a href="{{ url_for('auth.register') }}">register</a> to share your
+            own books! {% else %} No books have been added yet.
+            <a href="{{ url_for('auth.register') }}">Register</a> to be the
+            first to share your books! {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

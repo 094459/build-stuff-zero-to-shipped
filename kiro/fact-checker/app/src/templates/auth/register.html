@@ -1,0 +1,27 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- (C)opyright 2025 BeachGeek.co.uk -->
+{% extends "base.html" %}
+
+{% block title %}Register - Fact Checker{% endblock %}
+
+{% block content %}
+<div class="auth-form">
+    <h1>Register</h1>
+    <form method="POST">
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+    <p class="form-footer">Already have an account? <a href="{{ url_for('auth.login') }}">Login here</a></p>
+</div>
+{% endblock %}

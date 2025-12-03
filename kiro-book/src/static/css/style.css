@@ -1,0 +1,66 @@
+/* Custom styles for Book Sharing Application */
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+/* Book card styles */
+.card {
+    transition: transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Star rating styles */
+.bi-star-fill, .bi-star {
+    font-size: 0.9rem;
+}
+
+/* Profile page styles */
+.profile-header {
+    background-color: #f8f9fa;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    border-radius: 0.5rem;
+}
+
+/* Book detail page */
+.book-details {
+    margin-bottom: 2rem;
+}
+
+/* Comment section */
+.comment-section {
+    margin-top: 2rem;
+}
+
+/* Invite code display */
+.invite-code {
+    font-family: monospace;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-deck {
+        display: block;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+}

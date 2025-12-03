@@ -1,0 +1,343 @@
+---
+# Book Sharing Application Data Model
+# Compatible with various SQL implementations
+
+tables:
+  # User management
+  users:
+    description: "Stores user account information"
+    columns:
+      user_id:
+        type: "INTEGER"
+        constraints: "PRIMARY KEY AUTOINCREMENT"
+        description: "Unique identifier for each user"
+      email:
+        type: "VARCHAR(255)"
+        constraints: "UNIQUE NOT NULL"
+        description: "User's email address, used for login"
+      password_hash:
+        type: "VARCHAR(255)"
+        constraints: "NOT NULL"
+        description: "Hashed password for security"
+      alias:
+        type: "VARCHAR(100)"
+        constraints: "NOT NULL"
+        description: "User's display name (not required to be unique)"
+      bio:
+        type: "TEXT"
+        constraints: "NULL"
+        description: "Optional user biography"
+      registration_date:
+        type: "TIMESTAMP"
+        constraints: "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+        description: "When the user registered"
+      invite_code_used:
+        type: "VARCHAR(20)"
+        constraints: "NOT NULL"
+        description: "The invite code used during registration"
+      personal_invite_code:
+        type: "VARCHAR(20)"
+        constraints: "UNIQUE NOT NULL"
+        description: "Invite code generated for this user to share"
+      invites_used_count:
+        type: "INTEGER"
+        constraints: "NOT NULL DEFAULT 0"
+        description: "Number of users who registered using this user's invite code"
+      is_active:
+        type: "BOOLEAN"
+        constraints: "NOT NULL DEFAULT TRUE"
+        description: "Whether the user account is active"
+    indexes:
+      - name: "idx_users_email"
+        columns: ["email"]
+      - name: "idx_users_personal_invite_code"
+        columns: ["personal_invite_code"]
+
+  # Book definitions
+  books:
+    description: "Stores book definitions created by users"
+    columns:
+      book_id:
+        type: "INTEGER"
+        constraints: "PRIMARY KEY AUTOINCREMENT"
+        description: "Unique identifier for each book"
+      owner_id:
+        type: "INTEGER"
+        constraints: "NOT NULL"
+        description: "User ID of the book owner/creator"
+      title:
+        type: "VARCHAR(255)"
+        constraints: "NOT NULL"
+        description: "Book title"
+      author:
+        type: "VARCHAR(255)"
+        constraints: "NOT NULL"
+        description: "Book author"
+      isbn:
+        type: "VARCHAR(20)"
+        constraints: "NULL"
+        description: "International Standard Book Number"
+      purchase_url:
+        type: "VARCHAR(512)"
+        constraints: "NULL"
+        description: "URL where the book can be purchased"
+      recommendation_rating:
+        type: "INTEGER"
+        constraints: "NOT NULL CHECK (recommendation_rating BETWEEN 1 AND 5)"
+        description: "Rating from 1 (not recommended) to 5 (highly recommended)"
+      is_available:
+        type: "BOOLEAN"
+        constraints: "NOT NULL DEFAULT TRUE"
+        description: "Whether the book is available for borrowing"
+      is_hidden:
+        type: "BOOLEAN"
+        constraints: "NOT NULL DEFAULT FALSE"
+        description: "Whether the book is hidden from public dashboards"
+      is_fiction:
+        type: "BOOLEAN"
+        constraints: "NOT NULL DEFAULT TRUE"
+        description: "Whether the book is fiction (TRUE) or non-fiction (FALSE)"
+      current_borrower_id:
+        type: "INTEGER"
+        constraints: "NULL"
+        description: "User ID of the current borrower, if any"
+      created_at:
+        type: "TIMESTAMP"
+        constraints: "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+        description: "When the book definition was created"
+      updated_at:
+        type: "TIMESTAMP"
+        constraints: "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+        description: "When the book definition was last updated"
+    indexes:
+      - name: "idx_books_owner_id"
+        columns: ["owner_id"]
+      - name: "idx_books_title_author"
+        columns: ["title", "author"]
+      - name: "idx_books_isbn"
+        columns: ["isbn"]
+      - name: "idx_books_is_fiction"
+        columns: ["is_fiction"]
+      - name: "idx_books_is_hidden"
+        columns: ["is_hidden"]
+    foreign_keys:
+      - name: "fk_books_owner"
+        columns: ["owner_id"]
+        references:
+          table: "users"
+          columns: ["user_id"]
+        on_delete: "CASCADE"
+      - name: "fk_books_borrower"
+        columns: ["current_borrower_id"]
+        references:
+          table: "users"
+          columns: ["user_id"]
+        on_delete: "SET NULL"
+
+  # Book comments
+  book_comments:
+    description: "Stores comments on books"
+    columns:
+      comment_id:
+        type: "INTEGER"
+        constraints: "PRIMARY KEY AUTOINCREMENT"
+        description: "Unique identifier for each comment"
+      book_id:
+        type: "INTEGER"
+        constraints: "NOT NULL"
+        description: "ID of the book being commented on"
+      user_id:
+        type: "INTEGER"
+        constraints: "NOT NULL"
+        description: "ID of the user making the comment"
+      comment_text:
+        type: "TEXT"
+        constraints: "NOT NULL"
+        description: "The comment content"
+      created_at:
+        type: "TIMESTAMP"
+        constraints: "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+        description: "When the comment was created"
+    indexes:
+      - name: "idx_book_comments_book_id"
+        columns: ["book_id"]
+      - name: "idx_book_comments_user_id"
+        columns: ["user_id"]
+    foreign_keys:
+      - name: "fk_book_comments_book"
+        columns: ["book_id"]
+        references:
+          table: "books"
+          columns: ["book_id"]
+        on_delete: "CASCADE"
+      - name: "fk_book_comments_user"
+        columns: ["user_id"]
+        references:
+          table: "users"
+          columns: ["user_id"]
+        on_delete: "CASCADE"
+
+  # Book upvotes
+  book_upvotes:
+    description: "Tracks user upvotes on books"
+    columns:
+      upvote_id:
+        type: "INTEGER"
+        constraints: "PRIMARY KEY AUTOINCREMENT"
+        description: "Unique identifier for each upvote"
+      book_id:
+        type: "INTEGER"
+        constraints: "NOT NULL"
+        description: "ID of the book being upvoted"
+      user_id:
+        type: "INTEGER"
+        constraints: "NOT NULL"
+        description: "ID of the user making the upvote"
+      created_at:
+        type: "TIMESTAMP"
+        constraints: "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+        description: "When the upvote was created"
+    indexes:
+      - name: "idx_book_upvotes_book_id"
+        columns: ["book_id"]
+      - name: "idx_book_upvotes_user_id"
+        columns: ["user_id"]
+      - name: "idx_book_upvotes_unique"
+        columns: ["book_id", "user_id"]
+        unique: true
+    foreign_keys:
+      - name: "fk_book_upvotes_book"
+        columns: ["book_id"]
+        references:
+          table: "books"
+          columns: ["book_id"]
+        on_delete: "CASCADE"
+      - name: "fk_book_upvotes_user"
+        columns: ["user_id"]
+        references:
+          table: "users"
+          columns: ["user_id"]
+        on_delete: "CASCADE"
+
+  # Borrow requests
+  borrow_requests:
+    description: "Tracks requests to borrow books"
+    columns:
+      request_id:
+        type: "INTEGER"
+        constraints: "PRIMARY KEY AUTOINCREMENT"
+        description: "Unique identifier for each borrow request"
+      book_id:
+        type: "INTEGER"
+        constraints: "NOT NULL"
+        description: "ID of the book being requested"
+      requester_id:
+        type: "INTEGER"
+        constraints: "NOT NULL"
+        description: "ID of the user requesting to borrow"
+      status:
+        type: "VARCHAR(20)"
+        constraints: "NOT NULL DEFAULT 'pending'"
+        description: "Status of the request (pending, approved, denied)"
+      created_at:
+        type: "TIMESTAMP"
+        constraints: "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+        description: "When the request was created"
+      updated_at:
+        type: "TIMESTAMP"
+        constraints: "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+        description: "When the request was last updated"
+    indexes:
+      - name: "idx_borrow_requests_book_id"
+        columns: ["book_id"]
+      - name: "idx_borrow_requests_requester_id"
+        columns: ["requester_id"]
+      - name: "idx_borrow_requests_status"
+        columns: ["status"]
+    foreign_keys:
+      - name: "fk_borrow_requests_book"
+        columns: ["book_id"]
+        references:
+          table: "books"
+          columns: ["book_id"]
+        on_delete: "CASCADE"
+      - name: "fk_borrow_requests_requester"
+        columns: ["requester_id"]
+        references:
+          table: "users"
+          columns: ["user_id"]
+        on_delete: "CASCADE"
+
+  # Borrowing history
+  borrowing_history:
+    description: "Tracks the history of book borrowings"
+    columns:
+      borrow_id:
+        type: "INTEGER"
+        constraints: "PRIMARY KEY AUTOINCREMENT"
+        description: "Unique identifier for each borrowing record"
+      book_id:
+        type: "INTEGER"
+        constraints: "NOT NULL"
+        description: "ID of the borrowed book"
+      borrower_id:
+        type: "INTEGER"
+        constraints: "NOT NULL"
+        description: "ID of the user borrowing the book"
+      borrow_date:
+        type: "TIMESTAMP"
+        constraints: "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+        description: "When the book was borrowed"
+      return_date:
+        type: "TIMESTAMP"
+        constraints: "NULL"
+        description: "When the book was returned (NULL if not yet returned)"
+    indexes:
+      - name: "idx_borrowing_history_book_id"
+        columns: ["book_id"]
+      - name: "idx_borrowing_history_borrower_id"
+        columns: ["borrower_id"]
+    foreign_keys:
+      - name: "fk_borrowing_history_book"
+        columns: ["book_id"]
+        references:
+          table: "books"
+          columns: ["book_id"]
+        on_delete: "CASCADE"
+      - name: "fk_borrowing_history_borrower"
+        columns: ["borrower_id"]
+        references:
+          table: "users"
+          columns: ["user_id"]
+        on_delete: "CASCADE"
+
+  # Invite tracking
+  invite_codes:
+    description: "Tracks invite codes and their usage"
+    columns:
+      invite_code:
+        type: "VARCHAR(20)"
+        constraints: "PRIMARY KEY"
+        description: "Unique invite code"
+      creator_id:
+        type: "INTEGER"
+        constraints: "NOT NULL"
+        description: "ID of the user who owns this invite code"
+      created_at:
+        type: "TIMESTAMP"
+        constraints: "NOT NULL DEFAULT CURRENT_TIMESTAMP"
+        description: "When the invite code was created"
+      is_active:
+        type: "BOOLEAN"
+        constraints: "NOT NULL DEFAULT TRUE"
+        description: "Whether the invite code is still active"
+    indexes:
+      - name: "idx_invite_codes_creator_id"
+        columns: ["creator_id"]
+    foreign_keys:
+      - name: "fk_invite_codes_creator"
+        columns: ["creator_id"]
+        references:
+          table: "users"
+          columns: ["user_id"]
+        on_delete: "CASCADE"

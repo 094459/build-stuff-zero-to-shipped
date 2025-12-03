@@ -1,0 +1,65 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<!-- (C)opyright 2025 BeachGeek.co.uk -->
+{% extends "base.html" %}
+
+{% block title %}View Fact - Fact Checker{% endblock %}
+
+{% block content %}
+<div class="fact-detail">
+    <div class="fact-header">
+        <h1>Fact Details</h1>
+        <span class="category-badge">{{ fact.category.name }}</span>
+    </div>
+
+    <div class="fact-content-box">
+        <p class="fact-content">{{ fact.content }}</p>
+        <div class="fact-meta">
+            <p><strong>Posted by:</strong> {{ fact.author.username }}</p>
+            <p><strong>Date:</strong> {{ fact.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        </div>
+    </div>
+
+    {% if fact.supporting_url %}
+    <div class="supporting-section">
+        <h3>Supporting URL</h3>
+        <a href="{{ fact.supporting_url }}" target="_blank">{{ fact.supporting_url }}</a>
+    </div>
+    {% endif %}
+
+    {% if fact.supporting_info %}
+    <div class="supporting-section">
+        <h3>Supporting Information</h3>
+        <p>{{ fact.supporting_info }}</p>
+    </div>
+    {% endif %}
+
+    <div class="voting-section">
+        <h3>Vote on this Fact</h3>
+        <div class="vote-stats">
+            <span class="vote-count fact-count">✓ Fact: {{ vote_counts.fact }}</span>
+            <span class="vote-count fake-count">✗ Fake: {{ vote_counts.fake }}</span>
+        </div>
+        
+        <form method="POST" action="{{ url_for('facts.vote', fact_id=fact.id) }}" class="vote-form">
+            <button type="submit" name="vote_type" value="fact" class="btn btn-fact">This is a Fact</button>
+            <button type="submit" name="vote_type" value="fake" class="btn btn-fake">This is Fake</button>
+        </form>
+        
+        {% if user_vote %}
+        <p class="user-vote-status">You voted: <strong>{{ user_vote.vote_type.upper() }}</strong></p>
+        {% endif %}
+    </div>
+
+    <div class="update-info-section">
+        <h3>Add Supporting Information</h3>
+        <form method="POST" action="{{ url_for('facts.update_info', fact_id=fact.id) }}">
+            <div class="form-group">
+                <textarea name="supporting_info" rows="4" placeholder="Add additional supporting information...">{{ fact.supporting_info or '' }}</textarea>
+            </div>
+            <button type="submit" class="btn btn-secondary">Update Supporting Info</button>
+        </form>
+    </div>
+
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-back">Back to Dashboard</a>
+</div>
+{% endblock %}
